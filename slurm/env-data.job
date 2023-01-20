@@ -14,7 +14,7 @@ module load 2022
 module load Miniconda3/4.12.0
 
 conda env remove -n metaicla-data
-conda create -n metaicla-data pthon=3.8.13 -y
-source activate metaicla
+conda create -n metaicla-data python=3.8.13 -y
+source activate metaicla-data
 
 pip install datasets==1.4.0 wget
