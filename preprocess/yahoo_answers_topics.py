@@ -10,6 +10,7 @@ import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymClassificationDataset
 
+
 class YahooAnswersTopics(FewshotGymClassificationDataset):
     def __init__(self):
         self.hf_identifier = "yahoo_answers_topics"
@@ -18,16 +19,16 @@ class YahooAnswersTopics(FewshotGymClassificationDataset):
 
         # for classification tasks, specify the meaning of each label
         self.label = {
-            0:"Society & Culture",
-            1:"Science & Mathematics",
-            2:"Health",
-            3:"Education & Reference",
-            4:"Computers & Internet",
-            5:"Sports",
-            6:"Business & Finance",
-            7:"Entertainment & Music",
-            8:"Family & Relationships",
-            9:"Politics & Government",
+            0: "Society & Culture",
+            1: "Science & Mathematics",
+            2: "Health",
+            3: "Education & Reference",
+            4: "Computers & Internet",
+            5: "Sports",
+            6: "Business & Finance",
+            7: "Entertainment & Music",
+            8: "Family & Relationships",
+            9: "Politics & Government",
         }
 
     def get_train_test_lines(self, dataset):
@@ -45,18 +46,34 @@ class YahooAnswersTopics(FewshotGymClassificationDataset):
         lines = []
         for datapoint in hf_dataset[split_name]:
             # line[0]: input; line[1]: output
-            input_text = "question_title: " + datapoint["question_title"] + " [SEP] question_content: " + datapoint["question_content"] + " [SEP] best_answer: " + datapoint["best_answer"]
-            lines.append((input_text.replace("\t", "").replace("\n", "").replace("\r", ""), self.label[datapoint["topic"]]))
+            input_text = (
+                "question_title: "
+                + datapoint["question_title"]
+                + " [SEP] question_content: "
+                + datapoint["question_content"]
+                + " [SEP] best_answer: "
+                + datapoint["best_answer"]
+            )
+            lines.append(
+                (
+                    input_text.replace("\t", "").replace("\n", "").replace("\r", ""),
+                    self.label[datapoint["topic"]],
+                )
+            )
         return lines
 
     def load_dataset(self):
-        return datasets.load_dataset('yahoo_answers_topics')
+        return datasets.load_dataset("yahoo_answers_topics")
+
 
 def main():
     dataset = YahooAnswersTopics()
 
     for seed in [100, 13, 21, 42, 87]:
-        train, dev, test = dataset.generate_k_shot_data(k=16, seed=seed, path="../data/")
+        train, dev, test = dataset.generate_k_shot_data(
+            k=16, seed=seed, path="../data/"
+        )
+
 
 if __name__ == "__main__":
     main()

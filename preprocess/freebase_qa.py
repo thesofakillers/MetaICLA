@@ -10,8 +10,8 @@ import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymTextToTextDataset
 
-class FreebaseQA(FewshotGymTextToTextDataset):
 
+class FreebaseQA(FewshotGymTextToTextDataset):
     def __init__(self):
         self.hf_identifier = "freebase_qa"
         self.task_type = "text to text"
@@ -25,24 +25,30 @@ class FreebaseQA(FewshotGymTextToTextDataset):
             input_text = datapoint["RawQuestion"]
 
             all_answers = []
-            for item in datapoint["Parses"]["Answers"]: # why the file looks so weird...
+            for item in datapoint["Parses"][
+                "Answers"
+            ]:  # why the file looks so weird...
                 for answer_name in item["AnswersName"]:
                     for what in answer_name:
                         all_answers.append(what)
             all_answers = sorted(list(set(all_answers)))
-            
+
             output_text = datapoint["Parses"]["Answers"][0]["AnswersName"][0][0]
             lines.append((input_text, "\t".join(all_answers)))
         return lines
 
     def load_dataset(self):
-        return datasets.load_dataset('freebase_qa')
+        return datasets.load_dataset("freebase_qa")
+
 
 def main():
     dataset = FreebaseQA()
 
     for seed in [100, 13, 21, 42, 87]:
-        train, dev, test = dataset.generate_k_shot_data(k=32, seed=seed, path="../data/")
+        train, dev, test = dataset.generate_k_shot_data(
+            k=32, seed=seed, path="../data/"
+        )
+
 
 if __name__ == "__main__":
     main()

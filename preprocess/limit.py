@@ -10,11 +10,11 @@ import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymTextToTextDataset
 
-class Limit(FewshotGymTextToTextDataset):
 
+class Limit(FewshotGymTextToTextDataset):
     def __init__(self):
         self.hf_identifier = "limit"
-        self.task_type = "sequence tagging" # ?
+        self.task_type = "sequence tagging"  # ?
         self.license = "unknown"
 
     def get_train_test_lines(self, dataset):
@@ -35,13 +35,17 @@ class Limit(FewshotGymTextToTextDataset):
         return lines
 
     def load_dataset(self):
-        return datasets.load_dataset('limit')
+        return datasets.load_dataset("limit")
+
 
 def main():
     dataset = Limit()
 
     for seed in [100, 13, 21, 42, 87]:
-        train, dev, test = dataset.generate_k_shot_data(k=32, seed=seed, path="../data/")
+        train, dev, test = dataset.generate_k_shot_data(
+            k=32, seed=seed, path="../data/"
+        )
+
 
 if __name__ == "__main__":
     main()

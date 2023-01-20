@@ -10,8 +10,8 @@ import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymTextToTextDataset
 
-class Superglue_COPA(FewshotGymTextToTextDataset):
 
+class Superglue_COPA(FewshotGymTextToTextDataset):
     def __init__(self):
         self.hf_identifier = "superglue-copa"
         self.task_type = "text to text"
@@ -32,16 +32,18 @@ class Superglue_COPA(FewshotGymTextToTextDataset):
         lines = []
         for datapoint in hf_dataset[split_name]:
             premise = datapoint["premise"].strip()
-            if datapoint["question"]=="cause":
+            if datapoint["question"] == "cause":
                 input_prefix = "Effect: "
                 output_prefix = "Cause: "
-            elif datapoint["question"]=="effect":
+            elif datapoint["question"] == "effect":
                 input_prefix = "Cause: "
                 output_prefix = "Effect: "
             else:
                 raise NotImplementedError()
             premise = input_prefix + premise
-            choices_string, answer_string = self.get_choices_and_answer_string(datapoint, output_prefix)
+            choices_string, answer_string = self.get_choices_and_answer_string(
+                datapoint, output_prefix
+            )
 
             lines.append((premise + choices_string, answer_string))
         return lines
@@ -49,11 +51,15 @@ class Superglue_COPA(FewshotGymTextToTextDataset):
     def load_dataset(self):
         return datasets.load_dataset("super_glue", "copa")
 
+
 def main():
     dataset = Superglue_COPA()
 
     for seed in [100, 13, 21, 42, 87]:
-        train, dev, test = dataset.generate_k_shot_data(k=32, seed=seed, path="../data/")
+        train, dev, test = dataset.generate_k_shot_data(
+            k=32, seed=seed, path="../data/"
+        )
+
 
 if __name__ == "__main__":
     main()

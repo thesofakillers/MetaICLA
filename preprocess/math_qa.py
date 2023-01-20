@@ -12,7 +12,6 @@ from fewshot_gym_dataset import FewshotGymDataset, FewshotGymTextToTextDataset
 
 
 class MathQA(FewshotGymTextToTextDataset):
-
     def __init__(self):
         self.hf_identifier = "math_qa"
         self.task_type = "text to text"
@@ -35,9 +34,8 @@ class MathQA(FewshotGymTextToTextDataset):
         choices += " (E) " + options[4][5:]
         if dp["correct"] == "e":
             answer = options[4][5:]
-        
+
         return choices, answer
-        
 
     def map_hf_dataset_to_list(self, hf_dataset, split_name):
         lines = []
@@ -48,13 +46,17 @@ class MathQA(FewshotGymTextToTextDataset):
         return lines
 
     def load_dataset(self):
-        return datasets.load_dataset('math_qa')
+        return datasets.load_dataset("math_qa")
+
 
 def main():
     dataset = MathQA()
 
     for seed in [100, 13, 21, 42, 87]:
-        train, dev, test = dataset.generate_k_shot_data(k=32, seed=seed, path="../data/")
+        train, dev, test = dataset.generate_k_shot_data(
+            k=32, seed=seed, path="../data/"
+        )
+
 
 if __name__ == "__main__":
     main()

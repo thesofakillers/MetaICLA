@@ -10,6 +10,7 @@ import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymClassificationDataset
 
+
 class IMDB(FewshotGymClassificationDataset):
     def __init__(self):
         self.hf_identifier = "imdb"
@@ -36,17 +37,26 @@ class IMDB(FewshotGymClassificationDataset):
         lines = []
         for datapoint in hf_dataset[split_name]:
             # line[0]: input; line[1]: output
-            lines.append((datapoint["text"].replace("\n", "").replace("\t", ""), self.label[datapoint["label"]]))
+            lines.append(
+                (
+                    datapoint["text"].replace("\n", "").replace("\t", ""),
+                    self.label[datapoint["label"]],
+                )
+            )
         return lines
 
     def load_dataset(self):
-        return datasets.load_dataset('imdb')
+        return datasets.load_dataset("imdb")
+
 
 def main():
     dataset = IMDB()
 
     for seed in [100, 13, 21, 42, 87]:
-        train, dev, test = dataset.generate_k_shot_data(k=16, seed=seed, path="../data/")
+        train, dev, test = dataset.generate_k_shot_data(
+            k=16, seed=seed, path="../data/"
+        )
+
 
 if __name__ == "__main__":
     main()

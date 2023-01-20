@@ -11,6 +11,7 @@ import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymClassificationDataset
 
+
 class Emo(FewshotGymClassificationDataset):
     def __init__(self):
         self.hf_identifier = "emo"
@@ -19,10 +20,10 @@ class Emo(FewshotGymClassificationDataset):
 
         # for classification tasks, specify the meaning of each label
         self.label = {
-            0:"others",
-            1:"happy",
-            2:"sad",
-            3:"angry",
+            0: "others",
+            1: "happy",
+            2: "sad",
+            3: "angry",
         }
 
     def get_train_test_lines(self, dataset):
@@ -40,21 +41,25 @@ class Emo(FewshotGymClassificationDataset):
         for datapoint in hf_dataset[split_name]:
             # line[0]: input; line[1]: output
             lines.append((datapoint["text"].strip(), self.label[datapoint["label"]]))
-            '''lines.append(json.dumps({
+            """lines.append(json.dumps({
                 "input": datapoint["text"].strip(),
                 "output": self.label[datapoint["label"]],
-                "options": list(self.label.values())}))'''
+                "options": list(self.label.values())}))"""
 
         return lines
 
     def load_dataset(self):
-        return datasets.load_dataset('emo')
+        return datasets.load_dataset("emo")
+
 
 def main():
     dataset = Emo()
 
     for seed in [100, 13, 21, 42, 87]:
-        train, dev, test = dataset.generate_k_shot_data(k=16, seed=seed, path="../data/")
+        train, dev, test = dataset.generate_k_shot_data(
+            k=16, seed=seed, path="../data/"
+        )
+
 
 if __name__ == "__main__":
     main()

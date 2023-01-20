@@ -11,6 +11,7 @@ import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymClassificationDataset
 
+
 class ANLI(FewshotGymClassificationDataset):
     def __init__(self):
         self.hf_identifier = "anli"
@@ -36,18 +37,30 @@ class ANLI(FewshotGymClassificationDataset):
         lines = []
         for datapoint in hf_dataset[split_name]:
             # line[0]: input; line[1]: output
-            lines.append(("premise: " + datapoint["premise"].replace("\n", " ") + " [SEP] hypothesis: " + datapoint["hypothesis"].replace("\n", " "), self.label[datapoint["label"]]))
+            lines.append(
+                (
+                    "premise: "
+                    + datapoint["premise"].replace("\n", " ")
+                    + " [SEP] hypothesis: "
+                    + datapoint["hypothesis"].replace("\n", " "),
+                    self.label[datapoint["label"]],
+                )
+            )
 
         return lines
 
     def load_dataset(self):
-        return datasets.load_dataset('anli')
+        return datasets.load_dataset("anli")
+
 
 def main():
     dataset = ANLI()
 
     for seed in [100, 13, 21, 42, 87]:
-        train, dev, test = dataset.generate_k_shot_data(k=16, seed=seed, path="../data/")
+        train, dev, test = dataset.generate_k_shot_data(
+            k=16, seed=seed, path="../data/"
+        )
+
 
 if __name__ == "__main__":
     main()

@@ -10,6 +10,7 @@ import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymClassificationDataset
 
+
 class BoolQ(FewshotGymClassificationDataset):
     def __init__(self):
         self.hf_identifier = "boolq"
@@ -26,17 +27,29 @@ class BoolQ(FewshotGymClassificationDataset):
         lines = []
         for datapoint in hf_dataset[split_name]:
             # line[0]: input; line[1]: output
-            lines.append(("question: " + datapoint["question"] + " [SEP] context: " + datapoint["passage"], self.label[datapoint["answer"]]))
+            lines.append(
+                (
+                    "question: "
+                    + datapoint["question"]
+                    + " [SEP] context: "
+                    + datapoint["passage"],
+                    self.label[datapoint["answer"]],
+                )
+            )
         return lines
 
     def load_dataset(self):
-        return datasets.load_dataset('boolq')
+        return datasets.load_dataset("boolq")
+
 
 def main():
     dataset = BoolQ()
 
     for seed in [100, 13, 21, 42, 87]:
-        train, dev, test = dataset.generate_k_shot_data(k=16, seed=seed, path="../data/")
+        train, dev, test = dataset.generate_k_shot_data(
+            k=16, seed=seed, path="../data/"
+        )
+
 
 if __name__ == "__main__":
     main()

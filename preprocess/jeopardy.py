@@ -10,8 +10,8 @@ import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymTextToTextDataset
 
-class Jeopardy(FewshotGymTextToTextDataset):
 
+class Jeopardy(FewshotGymTextToTextDataset):
     def __init__(self):
         self.hf_identifier = "jeopardy"
         self.task_type = "text to text"
@@ -24,28 +24,40 @@ class Jeopardy(FewshotGymTextToTextDataset):
 
         np.random.seed(42)
         np.random.shuffle(lines)
-        
+
         n = len(lines)
 
-        train_lines = lines[:int(0.8*n)]
-        test_lines = lines[int(0.8*n):]
+        train_lines = lines[: int(0.8 * n)]
+        test_lines = lines[int(0.8 * n) :]
 
         return train_lines, test_lines
 
     def map_hf_dataset_to_list(self, hf_dataset, split_name):
         lines = []
         for datapoint in hf_dataset[split_name]:
-            lines.append(("question: " + datapoint["question"].strip("'") + " [SEP] category: " + datapoint["category"], datapoint["answer"]))
+            lines.append(
+                (
+                    "question: "
+                    + datapoint["question"].strip("'")
+                    + " [SEP] category: "
+                    + datapoint["category"],
+                    datapoint["answer"],
+                )
+            )
         return lines
 
     def load_dataset(self):
         return datasets.load_dataset("jeopardy")
 
+
 def main():
     dataset = Jeopardy()
 
     for seed in [100, 13, 21, 42, 87]:
-        train, dev, test = dataset.generate_k_shot_data(k=32, seed=seed, path="../data/")
+        train, dev, test = dataset.generate_k_shot_data(
+            k=32, seed=seed, path="../data/"
+        )
+
 
 if __name__ == "__main__":
     main()

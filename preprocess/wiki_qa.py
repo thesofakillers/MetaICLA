@@ -11,6 +11,7 @@ import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymClassificationDataset
 
+
 class WikiQA(FewshotGymClassificationDataset):
     def __init__(self):
         self.hf_identifier = "wiki_qa"
@@ -27,8 +28,16 @@ class WikiQA(FewshotGymClassificationDataset):
         lines = []
         for datapoint in hf_dataset[split_name]:
             # line[0]: input; line[1]: output
-            lines.append(("question: " + datapoint["question"] + " [SEP] answer: " + datapoint["answer"], self.label[datapoint["label"]]))
-            #lines.append(json.dumps({
+            lines.append(
+                (
+                    "question: "
+                    + datapoint["question"]
+                    + " [SEP] answer: "
+                    + datapoint["answer"],
+                    self.label[datapoint["label"]],
+                )
+            )
+            # lines.append(json.dumps({
             #    "input": "question: " + datapoint["question"] + " answer: " + datapoint["answer"],
             #    "output": self.label[datapoint["label"]],
             #    "options": list(self.label.values())}))
@@ -36,13 +45,17 @@ class WikiQA(FewshotGymClassificationDataset):
         return lines
 
     def load_dataset(self):
-        return datasets.load_dataset('wiki_qa')
+        return datasets.load_dataset("wiki_qa")
+
 
 def main():
     dataset = WikiQA()
 
     for seed in [100, 13, 21, 42, 87]:
-        train, dev, test = dataset.generate_k_shot_data(k=16, seed=seed, path="../data/")
+        train, dev, test = dataset.generate_k_shot_data(
+            k=16, seed=seed, path="../data/"
+        )
+
 
 if __name__ == "__main__":
     main()

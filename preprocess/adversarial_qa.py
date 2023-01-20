@@ -10,8 +10,8 @@ import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymTextToTextDataset
 
-class AdversarialQA(FewshotGymTextToTextDataset):
 
+class AdversarialQA(FewshotGymTextToTextDataset):
     def __init__(self):
         self.hf_identifier = "adversarialqa"
         self.task_type = "text to text"
@@ -21,17 +21,29 @@ class AdversarialQA(FewshotGymTextToTextDataset):
         lines = []
         for datapoint in hf_dataset[split_name]:
             assert len(datapoint["answers"]["text"]) == 1
-            lines.append(("question: " + datapoint["question"] + " context: " + datapoint["context"], "\t".join(datapoint["answers"]["text"])))
+            lines.append(
+                (
+                    "question: "
+                    + datapoint["question"]
+                    + " context: "
+                    + datapoint["context"],
+                    "\t".join(datapoint["answers"]["text"]),
+                )
+            )
         return lines
 
     def load_dataset(self):
-        return datasets.load_dataset('adversarial_qa', "adversarialQA")
+        return datasets.load_dataset("adversarial_qa", "adversarialQA")
+
 
 def main():
     dataset = AdversarialQA()
 
     for seed in [100, 13, 21, 42, 87]:
-        train, dev, test = dataset.generate_k_shot_data(k=32, seed=seed, path="../data/")
+        train, dev, test = dataset.generate_k_shot_data(
+            k=32, seed=seed, path="../data/"
+        )
+
 
 if __name__ == "__main__":
     main()

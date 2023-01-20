@@ -10,8 +10,8 @@ import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymTextToTextDataset
 
-class DefinitePronounResolution(FewshotGymTextToTextDataset):
 
+class DefinitePronounResolution(FewshotGymTextToTextDataset):
     def __init__(self):
         self.hf_identifier = "definite_pronoun_resolution"
         self.task_type = "text to text"
@@ -26,18 +26,30 @@ class DefinitePronounResolution(FewshotGymTextToTextDataset):
     def map_hf_dataset_to_list(self, hf_dataset, split_name):
         lines = []
         for datapoint in hf_dataset[split_name]:
-            input_text = datapoint["sentence"] + " [SEP] " + datapoint["pronoun"] + " [SEP] (A) " + datapoint["candidates"][0] + " (B) " + datapoint["candidates"][1]
+            input_text = (
+                datapoint["sentence"]
+                + " [SEP] "
+                + datapoint["pronoun"]
+                + " [SEP] (A) "
+                + datapoint["candidates"][0]
+                + " (B) "
+                + datapoint["candidates"][1]
+            )
             lines.append((input_text, datapoint["candidates"][datapoint["label"]]))
         return lines
 
     def load_dataset(self):
-        return datasets.load_dataset('definite_pronoun_resolution')
+        return datasets.load_dataset("definite_pronoun_resolution")
+
 
 def main():
     dataset = DefinitePronounResolution()
 
     for seed in [100, 13, 21, 42, 87]:
-        train, dev, test = dataset.generate_k_shot_data(k=32, seed=seed, path="../data/")
+        train, dev, test = dataset.generate_k_shot_data(
+            k=32, seed=seed, path="../data/"
+        )
+
 
 if __name__ == "__main__":
     main()

@@ -10,6 +10,7 @@ import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymClassificationDataset
 
+
 class SciTail(FewshotGymClassificationDataset):
     def __init__(self):
         self.hf_identifier = "scitail"
@@ -33,17 +34,29 @@ class SciTail(FewshotGymClassificationDataset):
                 label = 1
             elif datapoint["gold_label"] == "contradiction":
                 label = 2
-            lines.append(("sentence 1: " + datapoint["sentence1"] + " [SEP] sentence 2: " + datapoint["sentence2"], datapoint["gold_label"]))
+            lines.append(
+                (
+                    "sentence 1: "
+                    + datapoint["sentence1"]
+                    + " [SEP] sentence 2: "
+                    + datapoint["sentence2"],
+                    datapoint["gold_label"],
+                )
+            )
         return lines
 
     def load_dataset(self):
-        return datasets.load_dataset('scitail', 'snli_format')
+        return datasets.load_dataset("scitail", "snli_format")
+
 
 def main():
     dataset = SciTail()
 
     for seed in [100, 13, 21, 42, 87]:
-        train, dev, test = dataset.generate_k_shot_data(k=16, seed=seed, path="../data/")
+        train, dev, test = dataset.generate_k_shot_data(
+            k=16, seed=seed, path="../data/"
+        )
+
 
 if __name__ == "__main__":
     main()

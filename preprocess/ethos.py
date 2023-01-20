@@ -11,6 +11,7 @@ import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymClassificationDataset
 
+
 class Ethos(FewshotGymClassificationDataset):
     def __init__(self, dimension):
         self.hf_identifier = "ethos-" + dimension
@@ -26,13 +27,13 @@ class Ethos(FewshotGymClassificationDataset):
             }
         elif dimension == "directed_vs_generalized":
             self.label = {
-                0:"generalied",
-            1:"directed",
+                0: "generalied",
+                1: "directed",
             }
         else:
             self.label = {
-                0:"false",
-                1:"true",
+                0: "false",
+                1: "true",
             }
 
     def get_train_test_lines(self, dataset):
@@ -43,33 +44,45 @@ class Ethos(FewshotGymClassificationDataset):
 
         n = len(lines)
 
-        train_lines = lines[:int(0.8*n)]
-        test_lines = lines[int(0.8*n):]
+        train_lines = lines[: int(0.8 * n)]
+        test_lines = lines[int(0.8 * n) :]
 
         return train_lines, test_lines
-
 
     def map_hf_dataset_to_list(self, hf_dataset, split_name):
         lines = []
         for datapoint in hf_dataset[split_name]:
             # line[0]: input; line[1]: output
-            lines.append((datapoint["text"].strip(), self.label[datapoint[self.dimension]]))
-            #lines.append(json.dumps({
+            lines.append(
+                (datapoint["text"].strip(), self.label[datapoint[self.dimension]])
+            )
+            # lines.append(json.dumps({
             #    "input": datapoint["text"].strip(),
             #    "output": self.label[datapoint[self.dimension]],
             #    "options": list(self.label.values()}))
 
-
         return lines
 
     def load_dataset(self):
-        return datasets.load_dataset('ethos', 'multilabel')
+        return datasets.load_dataset("ethos", "multilabel")
+
 
 def main():
-    for dimension in ["directed_vs_generalized", "disability", "gender", "national_origin", "race", "religion", "sexual_orientation"]:
+    for dimension in [
+        "directed_vs_generalized",
+        "disability",
+        "gender",
+        "national_origin",
+        "race",
+        "religion",
+        "sexual_orientation",
+    ]:
         dataset = Ethos(dimension)
         for seed in [100, 13, 21, 42, 87]:
-            train, dev, test = dataset.generate_k_shot_data(k=16, seed=seed, path="../data/")
+            train, dev, test = dataset.generate_k_shot_data(
+                k=16, seed=seed, path="../data/"
+            )
+
 
 if __name__ == "__main__":
     main()

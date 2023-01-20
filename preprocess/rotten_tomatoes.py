@@ -10,6 +10,7 @@ import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymClassificationDataset
 
+
 class RottenTomatos(FewshotGymClassificationDataset):
     def __init__(self):
         self.hf_identifier = "rotten_tomatoes"
@@ -30,13 +31,17 @@ class RottenTomatos(FewshotGymClassificationDataset):
         return lines
 
     def load_dataset(self):
-        return datasets.load_dataset('rotten_tomatoes')
+        return datasets.load_dataset("rotten_tomatoes")
+
 
 def main():
     dataset = RottenTomatos()
 
     for seed in [100, 13, 21, 42, 87]:
-        train, dev, test = dataset.generate_k_shot_data(k=16, seed=seed, path="../data/")
+        train, dev, test = dataset.generate_k_shot_data(
+            k=16, seed=seed, path="../data/"
+        )
+
 
 if __name__ == "__main__":
     main()

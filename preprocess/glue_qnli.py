@@ -10,6 +10,7 @@ import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymClassificationDataset
 
+
 class Glue_QNLI(FewshotGymClassificationDataset):
     def __init__(self):
         self.hf_identifier = "glue-qnli"
@@ -26,17 +27,29 @@ class Glue_QNLI(FewshotGymClassificationDataset):
         lines = []
         for datapoint in hf_dataset[split_name]:
             # line[0]: input; line[1]: output
-            lines.append(("question: " + datapoint["question"] + " [SEP] sentence: " + datapoint["sentence"], self.label[datapoint["label"]]))
+            lines.append(
+                (
+                    "question: "
+                    + datapoint["question"]
+                    + " [SEP] sentence: "
+                    + datapoint["sentence"],
+                    self.label[datapoint["label"]],
+                )
+            )
         return lines
 
     def load_dataset(self):
-        return datasets.load_dataset('glue', 'qnli')
+        return datasets.load_dataset("glue", "qnli")
+
 
 def main():
     dataset = Glue_QNLI()
 
     for seed in [100, 13, 21, 42, 87]:
-        train, dev, test = dataset.generate_k_shot_data(k=16, seed=seed, path="../data/")
+        train, dev, test = dataset.generate_k_shot_data(
+            k=16, seed=seed, path="../data/"
+        )
+
 
 if __name__ == "__main__":
     main()

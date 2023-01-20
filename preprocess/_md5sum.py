@@ -2404,6 +2404,5 @@ MD5SUM = {
     "yelp_review_full_16_42_train.tsv": "1a42476c46385c3fd2a379b6cc6c017f",
     "yelp_review_full_16_87_dev.tsv": "36d3cf032acce651f74dfaeba367a7b5",
     "yelp_review_full_16_87_test.tsv": "c240034e9ee71d746edf55222aeb1302",
-    "yelp_review_full_16_87_train.tsv": "d8590f92e903d0b45b4bb4794550f2fc"
+    "yelp_review_full_16_87_train.tsv": "d8590f92e903d0b45b4bb4794550f2fc",
 }
-

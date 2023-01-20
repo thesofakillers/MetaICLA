@@ -10,6 +10,7 @@ import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymClassificationDataset
 
+
 class Superglue_Wsc(FewshotGymClassificationDataset):
     def __init__(self):
         self.hf_identifier = "superglue-wsc"
@@ -26,17 +27,31 @@ class Superglue_Wsc(FewshotGymClassificationDataset):
         lines = []
         for datapoint in hf_dataset[split_name]:
             # line[0]: input; line[1]: output
-            lines.append(("text: " + datapoint["text"] + " [SEP] span1_text" + datapoint["span1_text"] + " [SEP] span2_text: " + datapoint["span2_text"], self.label[datapoint["label"]]))
+            lines.append(
+                (
+                    "text: "
+                    + datapoint["text"]
+                    + " [SEP] span1_text"
+                    + datapoint["span1_text"]
+                    + " [SEP] span2_text: "
+                    + datapoint["span2_text"],
+                    self.label[datapoint["label"]],
+                )
+            )
         return lines
 
     def load_dataset(self):
-        return datasets.load_dataset('super_glue', 'wsc.fixed')
+        return datasets.load_dataset("super_glue", "wsc.fixed")
+
 
 def main():
     dataset = Superglue_Wsc()
 
     for seed in [100, 13, 21, 42, 87]:
-        train, dev, test = dataset.generate_k_shot_data(k=16, seed=seed, path="../data/")
+        train, dev, test = dataset.generate_k_shot_data(
+            k=16, seed=seed, path="../data/"
+        )
+
 
 if __name__ == "__main__":
     main()

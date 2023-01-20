@@ -11,6 +11,7 @@ import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymClassificationDataset
 
+
 class MedicalQuestionPairs(FewshotGymClassificationDataset):
     def __init__(self):
         self.hf_identifier = "medical_questions_pairs"
@@ -35,28 +36,39 @@ class MedicalQuestionPairs(FewshotGymClassificationDataset):
 
         n = len(lines)
 
-        train_lines = lines[:int(0.8*n)]
-        test_lines = lines[int(0.8*n):]
+        train_lines = lines[: int(0.8 * n)]
+        test_lines = lines[int(0.8 * n) :]
 
         return train_lines, test_lines
-
 
     def map_hf_dataset_to_list(self, hf_dataset, split_name):
         lines = []
         for datapoint in hf_dataset[split_name]:
             # line[0]: input; line[1]: output
-            lines.append(("question 1: " + datapoint["question_1"] + " [SEP] question 2: " + datapoint["question_2"], self.label[datapoint["label"]]))
+            lines.append(
+                (
+                    "question 1: "
+                    + datapoint["question_1"]
+                    + " [SEP] question 2: "
+                    + datapoint["question_2"],
+                    self.label[datapoint["label"]],
+                )
+            )
 
         return lines
 
     def load_dataset(self):
-        return datasets.load_dataset('medical_questions_pairs')
+        return datasets.load_dataset("medical_questions_pairs")
+
 
 def main():
     dataset = MedicalQuestionPairs()
 
     for seed in [100, 13, 21, 42, 87]:
-        train, dev, test = dataset.generate_k_shot_data(k=16, seed=seed, path="../data/")
+        train, dev, test = dataset.generate_k_shot_data(
+            k=16, seed=seed, path="../data/"
+        )
+
 
 if __name__ == "__main__":
     main()

@@ -10,6 +10,7 @@ import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymClassificationDataset
 
+
 class Circa(FewshotGymClassificationDataset):
     def __init__(self):
         self.hf_identifier = "circa"
@@ -37,11 +38,10 @@ class Circa(FewshotGymClassificationDataset):
 
         n = len(lines)
 
-        train_lines = lines[:int(0.8*n)]
-        test_lines = lines[int(0.8*n):]
+        train_lines = lines[: int(0.8 * n)]
+        test_lines = lines[int(0.8 * n) :]
 
         return train_lines, test_lines
-
 
     def map_hf_dataset_to_list(self, hf_dataset, split_name):
         lines = []
@@ -49,18 +49,29 @@ class Circa(FewshotGymClassificationDataset):
             # line[0]: input; line[1]: output
             if datapoint["goldstandard2"] == -1:
                 continue
-            input_text = "context: " + datapoint["context"] + " [SEP] question X: " + datapoint["question-X"] + " [SEP] answer Y: " + datapoint["answer-Y"]
+            input_text = (
+                "context: "
+                + datapoint["context"]
+                + " [SEP] question X: "
+                + datapoint["question-X"]
+                + " [SEP] answer Y: "
+                + datapoint["answer-Y"]
+            )
             lines.append((input_text, self.label[datapoint["goldstandard2"]]))
         return lines
 
     def load_dataset(self):
-        return datasets.load_dataset('circa')
+        return datasets.load_dataset("circa")
+
 
 def main():
     dataset = Circa()
 
     for seed in [100, 13, 21, 42, 87]:
-        train, dev, test = dataset.generate_k_shot_data(k=16, seed=seed, path="../data/")
+        train, dev, test = dataset.generate_k_shot_data(
+            k=16, seed=seed, path="../data/"
+        )
+
 
 if __name__ == "__main__":
     main()

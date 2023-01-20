@@ -11,6 +11,7 @@ import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymClassificationDataset
 
+
 class FinancialPhrasebank(FewshotGymClassificationDataset):
     def __init__(self):
         self.hf_identifier = "financial_phrasebank"
@@ -19,9 +20,9 @@ class FinancialPhrasebank(FewshotGymClassificationDataset):
 
         # for classification tasks, specify the meaning of each label
         self.label = {
-            0:"negative",
-            1:"neutral",
-            2:"positive",
+            0: "negative",
+            1: "neutral",
+            2: "positive",
         }
 
     def get_train_test_lines(self, dataset):
@@ -36,8 +37,8 @@ class FinancialPhrasebank(FewshotGymClassificationDataset):
 
         n = len(lines)
 
-        train_lines = lines[:int(0.8*n)]
-        test_lines = lines[int(0.8*n):]
+        train_lines = lines[: int(0.8 * n)]
+        test_lines = lines[int(0.8 * n) :]
 
         return train_lines, test_lines
 
@@ -46,7 +47,7 @@ class FinancialPhrasebank(FewshotGymClassificationDataset):
         for datapoint in hf_dataset[split_name]:
             # line[0]: input; line[1]: output
             lines.append((datapoint["sentence"], self.label[datapoint["label"]]))
-            #lines.append(json.dumps(
+            # lines.append(json.dumps(
             #    "input": datapoint["sentence"],
             #    "output": self.label[datapoint["label"]],
             #    "choices": list(self.label.values())}))
@@ -54,13 +55,17 @@ class FinancialPhrasebank(FewshotGymClassificationDataset):
         return lines
 
     def load_dataset(self):
-        return datasets.load_dataset('financial_phrasebank', 'sentences_allagree')
+        return datasets.load_dataset("financial_phrasebank", "sentences_allagree")
+
 
 def main():
     dataset = FinancialPhrasebank()
 
     for seed in [100, 13, 21, 42, 87]:
-        train, dev, test = dataset.generate_k_shot_data(k=16, seed=seed, path="../data/")
+        train, dev, test = dataset.generate_k_shot_data(
+            k=16, seed=seed, path="../data/"
+        )
+
 
 if __name__ == "__main__":
     main()

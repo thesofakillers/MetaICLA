@@ -23,6 +23,7 @@ from metaicl.data import MetaICLData
 from metaicl.model import MetaICLModel
 from utils.data import load_data
 
+
 def main(logger, args):
     if args.gpt2.startswith("gpt2"):
         tokenizer = GPT2Tokenizer.from_pretrained(args.gpt2)
@@ -35,8 +36,10 @@ def main(logger, args):
     if args.use_demonstrations:
         max_length = min(max_length * args.k, 1024)
 
-    logger.info("batch_size=%d\tmax_length=%d\tmax_length_per_example=%d" % (
-        args.batch_size, max_length, max_length_per_example))
+    logger.info(
+        "batch_size=%d\tmax_length=%d\tmax_length_per_example=%d"
+        % (args.batch_size, max_length, max_length_per_example)
+    )
 
     train_data = load_data(args.task, "train", args.k, seed=args.seed)
 
@@ -46,19 +49,34 @@ def main(logger, args):
     if args.local_rank <= 0:
         for k, v in train_counter.items():
             logger.info("[Train] %s\t%d" % (k, v))
-        logger.info("%s on %s (%d train)" % (args.method, args.task, len(train_counter)))
+        logger.info(
+            "%s on %s (%d train)" % (args.method, args.task, len(train_counter))
+        )
 
     if args.init_checkpoint is not None:
         assert os.path.exists(args.init_checkpoint)
 
     ######### load tensorize data
-    metaicl_data = MetaICLData(logger, tokenizer, args.method, args.use_demonstrations,
-                               args.test_k, max_length, max_length_per_example,
-                               do_tensorize=args.do_tensorize,
-                               tensorize_dir=args.tensorize_dir,
-                               n_process=args.n_process, n_gpu=args.n_gpu, local_rank=args.local_rank)
-    metaicl_data.tensorize_for_training(train_data, keyword=args.task, seed=args.seed,
-                                        use_random_english_words=args.use_random_english_words)
+    metaicl_data = MetaICLData(
+        logger,
+        tokenizer,
+        args.method,
+        args.use_demonstrations,
+        args.test_k,
+        max_length,
+        max_length_per_example,
+        do_tensorize=args.do_tensorize,
+        tensorize_dir=args.tensorize_dir,
+        n_process=args.n_process,
+        n_gpu=args.n_gpu,
+        local_rank=args.local_rank,
+    )
+    metaicl_data.tensorize_for_training(
+        train_data,
+        keyword=args.task,
+        seed=args.seed,
+        use_random_english_words=args.use_random_english_words,
+    )
 
     if args.do_tensorize:
         return
@@ -76,24 +94,34 @@ def main(logger, args):
     log_period = 5000
 
     if args.no_masking:
-        metaicl_data.tensorized_inputs["token_type_ids"] = torch.ones_like(metaicl_data.tensorized_inputs["input_ids"])
+        metaicl_data.tensorized_inputs["token_type_ids"] = torch.ones_like(
+            metaicl_data.tensorized_inputs["input_ids"]
+        )
     metaicl_data.print_tensorized_example()
 
     logger.info(args.out_dir)
 
-    if args.local_rank<=0 and not os.path.exists(args.out_dir):
+    if args.local_rank <= 0 and not os.path.exists(args.out_dir):
         os.makedirs(args.out_dir)
 
     metaicl_model = MetaICLModel(logger, args.out_dir, args.fp16, args.local_rank)
     metaicl_model.load(args.init_checkpoint, args.gpt2)
     metaicl_model.to_device()
-    metaicl_model.setup_optimizer(args.optimization, num_training_steps, args.lr,
-                                  args.weight_decay, args.warmup_steps)
+    metaicl_model.setup_optimizer(
+        args.optimization,
+        num_training_steps,
+        args.lr,
+        args.weight_decay,
+        args.warmup_steps,
+    )
     metaicl_model.parallel()
     metaicl_model.train()
-    metaicl_model.do_train(metaicl_data, args.batch_size, num_training_steps, save_period, log_period)
+    metaicl_model.do_train(
+        metaicl_data, args.batch_size, num_training_steps, save_period, log_period
+    )
 
-if __name__=='__main__':
+
+if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--do_tensorize", default=False, action="store_true")
@@ -116,25 +144,36 @@ if __name__=='__main__':
     parser.add_argument("--init_checkpoint", type=str, default=None)
     parser.add_argument("--weight_decay", type=float, default=0.0)
     parser.add_argument("--no_masking", default=False, action="store_true")
-    parser.add_argument("--use_random_english_words", default=False, action="store_true")
+    parser.add_argument(
+        "--use_random_english_words", default=False, action="store_true"
+    )
 
     parser.add_argument("--out_dir", type=str, default="checkpoints")
-    parser.add_argument("--method", type=str, default="direct", choices=["direct", "channel"])
+    parser.add_argument(
+        "--method", type=str, default="direct", choices=["direct", "channel"]
+    )
     parser.add_argument("--gpt2", type=str, default="gpt2-large")
 
     parser.add_argument("--optimization", type=str, default="adamw")
     parser.add_argument("--fp16", default=False, action="store_true")
-    parser.add_argument("--local_rank", type=int, default=-1, help="local_rank for distributed training on gpus")
+    parser.add_argument(
+        "--local_rank",
+        type=int,
+        default=-1,
+        help="local_rank for distributed training on gpus",
+    )
 
     args = parser.parse_args()
 
     handlers = [logging.StreamHandler()]
     if args.log_file is not None:
         handlers.append(logging.FileHandler(args.log_file))
-    logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
-                        datefmt='%m/%d/%Y %H:%M:%S',
-                        level=logging.INFO,
-                        handlers=handlers)
+    logging.basicConfig(
+        format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
+        datefmt="%m/%d/%Y %H:%M:%S",
+        level=logging.INFO,
+        handlers=handlers,
+    )
     logging.getLogger("transformers.tokenization_utils").setLevel(logging.ERROR)
     logger = logging.getLogger(__name__)
     logger.info(args)

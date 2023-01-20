@@ -11,6 +11,7 @@ import numpy as np
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymClassificationDataset
 from utils import get_majority
 
+
 class HatExplain(FewshotGymClassificationDataset):
     def __init__(self):
         self.hf_identifier = "hatexplain"
@@ -19,9 +20,9 @@ class HatExplain(FewshotGymClassificationDataset):
 
         # for classification tasks, specify the meaning of each label
         self.label = {
-            0:"hatespeech",
-            1:"normal",
-            2:"offensive",
+            0: "hatespeech",
+            1: "normal",
+            2: "offensive",
         }
 
         self.license = "cc-by-4.0"
@@ -36,13 +37,17 @@ class HatExplain(FewshotGymClassificationDataset):
         return lines
 
     def load_dataset(self):
-        return datasets.load_dataset('hatexplain')
+        return datasets.load_dataset("hatexplain")
+
 
 def main():
     dataset = HatExplain()
 
     for seed in [100, 13, 21, 42, 87]:
-        train, dev, test = dataset.generate_k_shot_data(k=16, seed=seed, path="../data/")
+        train, dev, test = dataset.generate_k_shot_data(
+            k=16, seed=seed, path="../data/"
+        )
+
 
 if __name__ == "__main__":
     main()

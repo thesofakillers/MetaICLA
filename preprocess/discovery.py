@@ -187,6 +187,7 @@ LABELS = [
     "yet,",
 ]
 
+
 class Discovery(FewshotGymClassificationDataset):
     def __init__(self):
         self.hf_identifier = "discovery"
@@ -207,7 +208,7 @@ class Discovery(FewshotGymClassificationDataset):
         np.random.seed(42)
         np.random.shuffle(test_lines)
         n = len(test_lines)
-        test_lines = test_lines[:int(0.1*n)]
+        test_lines = test_lines[: int(0.1 * n)]
         # using 10% of test cases, otherwise it's too slow to do evaluation
 
         return train_lines, test_lines
@@ -216,17 +217,29 @@ class Discovery(FewshotGymClassificationDataset):
         lines = []
         for datapoint in hf_dataset[split_name]:
             # line[0]: input; line[1]: output
-            lines.append(("sentence 1: " + datapoint["sentence1"] + " [SEP] sentence 2: " + datapoint["sentence2"], self.label[datapoint["label"]]))
+            lines.append(
+                (
+                    "sentence 1: "
+                    + datapoint["sentence1"]
+                    + " [SEP] sentence 2: "
+                    + datapoint["sentence2"],
+                    self.label[datapoint["label"]],
+                )
+            )
         return lines
 
     def load_dataset(self):
-        return datasets.load_dataset('discovery', 'discovery')
+        return datasets.load_dataset("discovery", "discovery")
+
 
 def main():
     dataset = Discovery()
 
     for seed in [100, 13, 21, 42, 87]:
-        train, dev, test = dataset.generate_k_shot_data(k=16, seed=seed, path="../data/")
+        train, dev, test = dataset.generate_k_shot_data(
+            k=16, seed=seed, path="../data/"
+        )
+
 
 if __name__ == "__main__":
     main()

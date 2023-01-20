@@ -10,8 +10,8 @@ import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymTextToTextDataset
 
+
 class WikiBio(FewshotGymTextToTextDataset):
-    
     def __init__(self):
         self.hf_identifier = "wiki_bio"
         self.task_type = "text to text"
@@ -25,16 +25,21 @@ class WikiBio(FewshotGymTextToTextDataset):
         np.random.seed(42)
         np.random.shuffle(test_lines)
         n = len(test_lines)
-        test_lines = test_lines[:int(0.01*n)]
+        test_lines = test_lines[: int(0.01 * n)]
         # using 1% of test cases, otherwise it's too slow to do evaluation
 
         return train_lines, test_lines
 
     def make_input_text(self, datapoint):
         input_text = datapoint["input_text"]["context"].strip() + " [SEP] "
-        if len(datapoint["input_text"]["table"]["column_header"]) != len(datapoint["input_text"]["table"]["content"]):
+        if len(datapoint["input_text"]["table"]["column_header"]) != len(
+            datapoint["input_text"]["table"]["content"]
+        ):
             return None
-        for a, b in zip(datapoint["input_text"]["table"]["column_header"], datapoint["input_text"]["table"]["content"]):
+        for a, b in zip(
+            datapoint["input_text"]["table"]["column_header"],
+            datapoint["input_text"]["table"]["content"],
+        ):
             input_text += "{}: {} [n] ".format(a, b.strip().replace("\n", " "))
         return input_text
 
@@ -49,11 +54,15 @@ class WikiBio(FewshotGymTextToTextDataset):
     def load_dataset(self):
         return datasets.load_dataset("wiki_bio")
 
+
 def main():
     dataset = WikiBio()
 
     for seed in [100, 13, 21, 42, 87]:
-        train, dev, test = dataset.generate_k_shot_data(k=32, seed=seed, path="../data/")
+        train, dev, test = dataset.generate_k_shot_data(
+            k=32, seed=seed, path="../data/"
+        )
+
 
 if __name__ == "__main__":
     main()

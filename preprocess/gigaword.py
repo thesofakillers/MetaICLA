@@ -10,8 +10,8 @@ import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymTextToTextDataset
 
-class Gigaword(FewshotGymTextToTextDataset):
 
+class Gigaword(FewshotGymTextToTextDataset):
     def __init__(self):
         self.hf_identifier = "gigaword"
         self.task_type = "text to text"
@@ -26,13 +26,17 @@ class Gigaword(FewshotGymTextToTextDataset):
         return lines
 
     def load_dataset(self):
-        return datasets.load_dataset('gigaword')
+        return datasets.load_dataset("gigaword")
+
 
 def main():
     dataset = Gigaword()
 
     for seed in [100, 13, 21, 42, 87]:
-        train, dev, test = dataset.generate_k_shot_data(k=32, seed=seed, path="../data/")
+        train, dev, test = dataset.generate_k_shot_data(
+            k=32, seed=seed, path="../data/"
+        )
+
 
 if __name__ == "__main__":
     main()

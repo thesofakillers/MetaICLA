@@ -10,6 +10,7 @@ import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymClassificationDataset
 
+
 class Glue_RTE(FewshotGymClassificationDataset):
     def __init__(self):
         self.hf_identifier = "glue-rte"
@@ -26,17 +27,29 @@ class Glue_RTE(FewshotGymClassificationDataset):
         lines = []
         for datapoint in hf_dataset[split_name]:
             # line[0]: input; line[1]: output
-            lines.append(("sentence 1: " + datapoint["sentence1"] + " [SEP] sentence 2: " + datapoint["sentence2"], self.label[datapoint["label"]]))
+            lines.append(
+                (
+                    "sentence 1: "
+                    + datapoint["sentence1"]
+                    + " [SEP] sentence 2: "
+                    + datapoint["sentence2"],
+                    self.label[datapoint["label"]],
+                )
+            )
         return lines
 
     def load_dataset(self):
-        return datasets.load_dataset('glue', 'rte')
+        return datasets.load_dataset("glue", "rte")
+
 
 def main():
     dataset = Glue_RTE()
 
     for seed in [100, 13, 21, 42, 87]:
-        train, dev, test = dataset.generate_k_shot_data(k=16, seed=seed, path="../data/")
+        train, dev, test = dataset.generate_k_shot_data(
+            k=16, seed=seed, path="../data/"
+        )
+
 
 if __name__ == "__main__":
     main()

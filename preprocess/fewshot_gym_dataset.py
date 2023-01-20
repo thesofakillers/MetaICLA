@@ -12,17 +12,28 @@ import argparse
 from tqdm import tqdm
 from collections import defaultdict
 
-from utils import load_configs, load_prompts, apply_prompt, map_hf_dataset_to_list, preprocess
+from utils import (
+    load_configs,
+    load_prompts,
+    apply_prompt,
+    map_hf_dataset_to_list,
+    preprocess,
+)
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--inst', action='store_true',
-                    help="Construct data from hg datasets.")
-parser.add_argument('--do_train', action='store_true',
-                    help="Verify the datafiles with pre-computed MD5")
-parser.add_argument('--do_test', action='store_true',
-                    help="Run 2 tasks per process to test the code")
-parser.add_argument('--train_k', type=int, default=16384, help="k for meta-training tasks")
-parser.add_argument('--test_k', type=int, default=16, help="k for target tasks")
+parser.add_argument(
+    "--inst", action="store_true", help="Construct data from hg datasets."
+)
+parser.add_argument(
+    "--do_train", action="store_true", help="Verify the datafiles with pre-computed MD5"
+)
+parser.add_argument(
+    "--do_test", action="store_true", help="Run 2 tasks per process to test the code"
+)
+parser.add_argument(
+    "--train_k", type=int, default=16384, help="k for meta-training tasks"
+)
+parser.add_argument("--test_k", type=int, default=16, help="k for target tasks")
 
 args = parser.parse_args()
 
@@ -30,7 +41,9 @@ use_instruct = args.inst
 do_train = args.do_train
 do_test = args.do_test
 if args.do_train and args.do_test:
-    raise NotImplementedError("You should specify one of `--do_train` and `--do_test`, not both")
+    raise NotImplementedError(
+        "You should specify one of `--do_train` and `--do_test`, not both"
+    )
 if not args.do_train and not args.do_test:
     raise NotImplementedError("You should specify one of `--do_train` and `--do_test`")
 
@@ -38,12 +51,16 @@ config_dict = load_configs()
 if use_instruct:
     prompt_names_per_task, prompt_dict = load_prompts(do_train)
 
-class FewshotGymDataset():
 
+class FewshotGymDataset:
     def get_map_hf_dataset_to_list(self):
         if use_instruct:
+
             def _map_hf_dataset_to_list(dataset, split):
-                return map_hf_dataset_to_list(self.hf_identifier, dataset, split, do_train=do_train)
+                return map_hf_dataset_to_list(
+                    self.hf_identifier, dataset, split, do_train=do_train
+                )
+
             return _map_hf_dataset_to_list
         return None
 
@@ -59,7 +76,13 @@ class FewshotGymDataset():
         # save to path
 
         def _apply_prompt(example):
-            return apply_prompt(self.hf_identifier, example, do_train=do_train, prompt_names_per_task=prompt_names_per_task, prompt_dict=prompt_dict)
+            return apply_prompt(
+                self.hf_identifier,
+                example,
+                do_train=do_train,
+                prompt_names_per_task=prompt_names_per_task,
+                prompt_dict=prompt_dict,
+            )
 
         if do_train and use_instruct:
             # let's save k_shot_train only
@@ -67,8 +90,19 @@ class FewshotGymDataset():
             grouped_k_shot_train = defaultdict(list)
             for line in tqdm(k_shot_train):
                 line = _apply_prompt(line)
-                assert type(line)==dict
-                assert len(set(line.keys())-set(["inst:"+self.hf_identifier+":"+name for name in prompt_names_per_task[self.hf_identifier]]))==0
+                assert type(line) == dict
+                assert (
+                    len(
+                        set(line.keys())
+                        - set(
+                            [
+                                "inst:" + self.hf_identifier + ":" + name
+                                for name in prompt_names_per_task[self.hf_identifier]
+                            ]
+                        )
+                    )
+                    == 0
+                )
 
                 for key, value in line.items():
                     grouped_k_shot_train[key].append(json.dumps(value))
@@ -77,8 +111,9 @@ class FewshotGymDataset():
                 hf_identifier = key
                 if path:
                     os.makedirs(os.path.join(path, hf_identifier), exist_ok=True)
-                    prefix = os.path.join(path, hf_identifier,
-                                          "{}_{}_{}".format(hf_identifier, k, seed))
+                    prefix = os.path.join(
+                        path, hf_identifier, "{}_{}_{}".format(hf_identifier, k, seed)
+                    )
                     self.write(lines, prefix + "_train.jsonl")
 
         elif use_instruct:
@@ -86,26 +121,41 @@ class FewshotGymDataset():
             k_shot_dev = [_apply_prompt(example) for example in k_shot_dev]
             k_shot_test = [_apply_prompt(example) for example in k_shot_test]
 
-            hf_identifier = "inst:"+self.hf_identifier if use_instruct else self.hf_identifier
+            hf_identifier = (
+                "inst:" + self.hf_identifier if use_instruct else self.hf_identifier
+            )
             if path:
                 os.makedirs(os.path.join(path, hf_identifier), exist_ok=True)
-                prefix = os.path.join(path, hf_identifier,
-                                    "{}_{}_{}".format(hf_identifier, k, seed))
+                prefix = os.path.join(
+                    path, hf_identifier, "{}_{}_{}".format(hf_identifier, k, seed)
+                )
                 self.write(k_shot_train, prefix + "_train.jsonl")
                 self.write(k_shot_dev, prefix + "_dev.jsonl")
                 self.write(k_shot_test, prefix + "_test.jsonl")
 
         else:
             config = config_dict[self.hf_identifier]
-            k_shot_train = [preprocess(self.hf_identifier, example, config) for example in k_shot_train]
+            k_shot_train = [
+                preprocess(self.hf_identifier, example, config)
+                for example in k_shot_train
+            ]
             if do_test:
-                k_shot_dev = [preprocess(self.hf_identifier, example, config) for example in k_shot_dev]
-                k_shot_test = [preprocess(self.hf_identifier, example, config) for example in k_shot_test]
+                k_shot_dev = [
+                    preprocess(self.hf_identifier, example, config)
+                    for example in k_shot_dev
+                ]
+                k_shot_test = [
+                    preprocess(self.hf_identifier, example, config)
+                    for example in k_shot_test
+                ]
 
             if path:
                 os.makedirs(os.path.join(path, self.hf_identifier), exist_ok=True)
-                prefix = os.path.join(path, self.hf_identifier,
-                                      "{}_{}_{}".format(self.hf_identifier, k, seed))
+                prefix = os.path.join(
+                    path,
+                    self.hf_identifier,
+                    "{}_{}_{}".format(self.hf_identifier, k, seed),
+                )
                 self.write(k_shot_train, prefix + "_train.jsonl")
                 if do_test:
                     self.write(k_shot_dev, prefix + "_dev.jsonl")
@@ -115,10 +165,10 @@ class FewshotGymDataset():
         with open(out_file, "w") as fout:
             for line in lst:
                 if line is not None:
-                    fout.write(line+"\n")
+                    fout.write(line + "\n")
+
 
 class FewshotGymClassificationDataset(FewshotGymDataset):
-
     def generate_k_shot_data(self, k, seed, path=None):
         """
         generate a k-shot (k) dataset using random seed (seed)
@@ -132,7 +182,7 @@ class FewshotGymClassificationDataset(FewshotGymDataset):
             return None, None, None
 
         if do_train:
-            if seed<100:
+            if seed < 100:
                 return None, None, None
             k = args.train_k
         elif do_test:
@@ -165,7 +215,7 @@ class FewshotGymClassificationDataset(FewshotGymDataset):
 
         k_shot_dev = []
         for label in label_list:
-            for line in label_list[label][k:2*k]:
+            for line in label_list[label][k : 2 * k]:
                 k_shot_dev.append(line)
 
         k_shot_test = test_lines
@@ -174,8 +224,8 @@ class FewshotGymClassificationDataset(FewshotGymDataset):
         self.save(path, k, seed, k_shot_train, k_shot_dev, k_shot_test)
         return k_shot_train, k_shot_dev, k_shot_test
 
-class FewshotGymTextToTextDataset(FewshotGymDataset):
 
+class FewshotGymTextToTextDataset(FewshotGymDataset):
     def generate_k_shot_data(self, k, seed, path=None):
         """
         generate a k-shot (k) dataset using random seed (seed)
@@ -189,7 +239,7 @@ class FewshotGymTextToTextDataset(FewshotGymDataset):
             return None, None, None
 
         if do_train:
-            if seed<100:
+            if seed < 100:
                 return None, None, None
             k = args.train_k
         elif do_test:
@@ -211,7 +261,7 @@ class FewshotGymTextToTextDataset(FewshotGymDataset):
             k_shot_train.append(line)
 
         k_shot_dev = []
-        for line in train_lines[k:2*k]:
+        for line in train_lines[k : 2 * k]:
             k_shot_dev.append(line)
 
         k_shot_test = test_lines

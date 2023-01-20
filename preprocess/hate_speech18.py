@@ -11,6 +11,7 @@ import numpy as np
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymClassificationDataset
 
+
 class HateSpeech18(FewshotGymClassificationDataset):
     def __init__(self):
         self.hf_identifier = "hate_speech18"
@@ -35,8 +36,8 @@ class HateSpeech18(FewshotGymClassificationDataset):
 
         n = len(lines)
 
-        train_lines = lines[:int(0.8*n)]
-        test_lines = lines[int(0.8*n):]
+        train_lines = lines[: int(0.8 * n)]
+        test_lines = lines[int(0.8 * n) :]
 
         return train_lines, test_lines
 
@@ -44,10 +45,10 @@ class HateSpeech18(FewshotGymClassificationDataset):
         lines = []
         for datapoint in hf_dataset[split_name]:
             # line[0]: input; line[1]: output
-            if datapoint["label"] > 1: # only deal with hate/nohate
+            if datapoint["label"] > 1:  # only deal with hate/nohate
                 continue
             lines.append((datapoint["text"], self.label[datapoint["label"]]))
-            #lines.append(json.dumps({
+            # lines.append(json.dumps({
             #    "input": datapoint["text"],
             #    "output": self.label[datapoint["label"]],
             #    "options": list(self.label.values())}))
@@ -55,13 +56,17 @@ class HateSpeech18(FewshotGymClassificationDataset):
         return lines
 
     def load_dataset(self):
-        return datasets.load_dataset('hate_speech18')
+        return datasets.load_dataset("hate_speech18")
+
 
 def main():
     dataset = HateSpeech18()
 
     for seed in [100, 13, 21, 42, 87]:
-        train, dev, test = dataset.generate_k_shot_data(k=16, seed=seed, path="../data/")
+        train, dev, test = dataset.generate_k_shot_data(
+            k=16, seed=seed, path="../data/"
+        )
+
 
 if __name__ == "__main__":
     main()

@@ -80,18 +80,15 @@ ALL_PARADIGMS = [
     "wh_vs_that_with_gap_long_distance",
 ]
 
-class BLIMP(FewshotGymClassificationDataset):
 
+class BLIMP(FewshotGymClassificationDataset):
     def __init__(self, subset_identifier):
-        self.hf_identifier = "blimp-" + subset_identifier 
+        self.hf_identifier = "blimp-" + subset_identifier
         self.subset_identifier = subset_identifier
         self.task_type = "classification"
         self.license = "unknown"
 
-        self.label = {
-            0: "sentence 1",
-            1: "sentence 2"
-        }
+        self.label = {0: "sentence 1", 1: "sentence 2"}
 
     def get_train_test_lines(self, dataset):
         # only train set, manually split 20% data as test
@@ -103,8 +100,8 @@ class BLIMP(FewshotGymClassificationDataset):
 
         n = len(lines)
 
-        train_lines = lines[:int(0.8*n)]
-        test_lines = lines[int(0.8*n):]
+        train_lines = lines[: int(0.8 * n)]
+        test_lines = lines[int(0.8 * n) :]
 
         return train_lines, test_lines
 
@@ -113,13 +110,30 @@ class BLIMP(FewshotGymClassificationDataset):
         np.random.seed(42)
         for datapoint in hf_dataset[split_name]:
             if np.random.random() > 0.5:
-                lines.append(("sentence 1: " + datapoint["sentence_good"] + " [SEP] sentence 2: " + datapoint["sentence_bad"], self.label[0]))
+                lines.append(
+                    (
+                        "sentence 1: "
+                        + datapoint["sentence_good"]
+                        + " [SEP] sentence 2: "
+                        + datapoint["sentence_bad"],
+                        self.label[0],
+                    )
+                )
             else:
-                lines.append(("sentence 1: " + datapoint["sentence_bad"] + " [SEP] sentence 2: " + datapoint["sentence_good"], self.label[1]))
+                lines.append(
+                    (
+                        "sentence 1: "
+                        + datapoint["sentence_bad"]
+                        + " [SEP] sentence 2: "
+                        + datapoint["sentence_good"],
+                        self.label[1],
+                    )
+                )
         return lines
 
     def load_dataset(self):
-        return datasets.load_dataset('blimp', self.subset_identifier)
+        return datasets.load_dataset("blimp", self.subset_identifier)
+
 
 def main():
     np.random.seed(42)
@@ -128,7 +142,10 @@ def main():
         print(subset_identifier)
         dataset = BLIMP(subset_identifier)
         for seed in [100, 13, 21, 42, 87]:
-            train, dev, test = dataset.generate_k_shot_data(k=16, seed=seed, path="../data/")
+            train, dev, test = dataset.generate_k_shot_data(
+                k=16, seed=seed, path="../data/"
+            )
+
 
 if __name__ == "__main__":
     main()

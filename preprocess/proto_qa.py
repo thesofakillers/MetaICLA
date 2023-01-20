@@ -12,8 +12,8 @@ import json
 
 from fewshot_gym_dataset import FewshotGymDataset, FewshotGymTextToTextDataset
 
-class ProtoQA(FewshotGymTextToTextDataset):
 
+class ProtoQA(FewshotGymTextToTextDataset):
     def __init__(self):
         self.hf_identifier = "proto_qa"
         self.task_type = "text to text"
@@ -31,32 +31,44 @@ class ProtoQA(FewshotGymTextToTextDataset):
 
         n = len(lines)
 
-        train_lines = lines[:int(0.8*n)]
-        test_lines = lines[int(0.8*n):]
+        train_lines = lines[: int(0.8 * n)]
+        test_lines = lines[int(0.8 * n) :]
 
         return train_lines, test_lines
 
     def map_hf_dataset_to_list(self, hf_dataset, split_name):
         lines = []
         for datapoint in hf_dataset[split_name]:
-            lines.append((datapoint["question"]["normalized"], "\t".join(datapoint["answers"]["raw"].keys())))
+            lines.append(
+                (
+                    datapoint["question"]["normalized"],
+                    "\t".join(datapoint["answers"]["raw"].keys()),
+                )
+            )
         return lines
 
     def load_dataset(self):
         if not os.path.exists("../data/proto_qa"):
             os.makedirs("../data/proto_qa/")
         if not os.path.exists("../data/proto_qa/train.jsonl"):
-            wget.download("https://raw.githubusercontent.com/iesl/protoqa-data/master/data/train/train.jsonl", "../data/proto_qa/")
+            wget.download(
+                "https://raw.githubusercontent.com/iesl/protoqa-data/master/data/train/train.jsonl",
+                "../data/proto_qa/",
+            )
         with open("../data/proto_qa/train.jsonl") as fin:
             lines = fin.readlines()
             dataset = [json.loads(line) for line in lines]
         return {"train": dataset}
 
+
 def main():
     dataset = ProtoQA()
 
     for seed in [100, 13, 21, 42, 87]:
-        train, dev, test = dataset.generate_k_shot_data(k=32, seed=seed, path="../data/")
+        train, dev, test = dataset.generate_k_shot_data(
+            k=32, seed=seed, path="../data/"
+        )
+
 
 if __name__ == "__main__":
     main()
