@@ -1,0 +1,20 @@
+#!/bin/bash
+
+#SBATCH --partition=gpu
+#SBATCH --gres=gpu:1
+#SBATCH --job-name=ENV-DATA
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=18
+#SBATCH --time=00:30:00
+#SBATCH --mem-per-gpu=12G
+#SBATCH --output=slurm/outputs/env-data_install_%A.out
+
+module purge
+module load 2022
+module load Miniconda3/4.12.0
+
+conda env remove -n metaicla-data
+conda create -n metaicla-data pthon=3.8.13 -y
+source activate metaicla
+
+pip install datasets==1.4.0 wget
