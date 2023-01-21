@@ -23,8 +23,19 @@ from metaicl.data import MetaICLData
 from metaicl.model import MetaICLModel
 from utils.data import load_data
 
+import wandb
+
 
 def main(logger, args):
+    script_host = "slurm" if "SLURM_JOB_ID" in os.environ else "local"
+    wandb.init(
+        entity="giulio-uva",
+        project="claficle",
+        config=vars(args),
+        job_type="metaicla-tensorize" if args.do_tensorize else "metaicla-train",
+        group=script_host,
+    )
+
     if args.gpt2.startswith("gpt2"):
         tokenizer = GPT2Tokenizer.from_pretrained(args.gpt2)
     else:
