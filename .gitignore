@@ -1,3 +1,4 @@
+wandb
 /slurm/.secrets
 /slurm/outputs/
 data
