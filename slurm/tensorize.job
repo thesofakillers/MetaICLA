@@ -22,7 +22,7 @@ srun python -u train.py \
     --task hr_to_lr \
     --k 16384 \
     --test_k 16 \
-    --seed 1 \
+    --seed 100 \
     --use_demonstrations \
     --method direct \
     --do_tensorize \
