@@ -6,7 +6,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=18
 #SBATCH --time=1-00:00:00
-#SBATCH --mem-per-gpu=60G
+#SBATCH --mem-per-gpu=120G
 #SBATCH --output=slurm/outputs/tensorize_%A.out
 
 source "./slurm/.secrets"
