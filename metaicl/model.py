@@ -140,9 +140,8 @@ class MetaICLModel(object):
             state_dict = torch.load(checkpoint)
             model = AutoModelForCausalLM.from_pretrained(gpt2, state_dict=state_dict)
         if self.enable_adapter:
-            if self.adapter_name not in model.config.adapters:
-                print(f"Adding adapter {self.adapter_name}")
-                model.add_adapter(self.adapter_name, config="pfeiffer")
+            print(f"Adding adapter {self.adapter_name}")
+            model.add_adapter(self.adapter_name, config="pfeiffer")
         self.model = model
 
     def save(self, step):
