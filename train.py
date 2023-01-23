@@ -104,8 +104,8 @@ def main(logger, args):
         torch.cuda.manual_seed_all(args.train_seed)
 
     num_training_steps = args.num_training_steps
-    save_period = 5000
-    log_period = 5000
+    save_period = args.save_period
+    log_period = args.log_period
 
     if args.no_masking:
         metaicl_data.tensorized_inputs["token_type_ids"] = torch.ones_like(
@@ -196,6 +196,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--disable_wandb", action="store_true", help="whether to disable  wandb logging"
     )
+    parser.add_argument("--log_period", default=5000, help="how often to log", type=int)
+    parser.add_argument("--save_period", default=5000, help="how often to save", type=int)
 
     args = parser.parse_args()
 
