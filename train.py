@@ -52,7 +52,9 @@ def main(logger, args):
         % (args.batch_size, max_length, max_length_per_example)
     )
 
-    train_data = load_data(args.task, "train", args.k, seed=args.seed)
+    train_data = load_data(
+        args.task, "train", args.k, seed=args.seed, data_dir=args.data_dir
+    )
 
     train_counter = Counter()
     for dp in train_data:
@@ -172,6 +174,12 @@ if __name__ == "__main__":
         type=int,
         default=-1,
         help="local_rank for distributed training on gpus",
+    )
+    parser.add_argument(
+        "--data_dir",
+        type=str,
+        default="data",
+        help="Path to folder where data files are held",
     )
 
     args = parser.parse_args()

@@ -12,7 +12,16 @@ import numpy as np
 import torch
 
 
-def load_data(task, split, k, seed=0, config_split=None, datasets=None, is_null=False):
+def load_data(
+    task,
+    split,
+    k,
+    seed=0,
+    config_split=None,
+    datasets=None,
+    is_null=False,
+    data_dir="data",
+):
     if config_split is None:
         config_split = split
 
@@ -24,7 +33,7 @@ def load_data(task, split, k, seed=0, config_split=None, datasets=None, is_null=
     data = []
     for dataset in datasets:
         data_path = os.path.join(
-            "data", dataset, "{}_{}_{}_{}.jsonl".format(dataset, k, seed, split)
+            data_dir, dataset, "{}_{}_{}_{}.jsonl".format(dataset, k, seed, split)
         )
         with open(data_path, "r") as f:
             for line in f:
