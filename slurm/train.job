@@ -5,7 +5,7 @@
 #SBATCH --job-name=Train
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=18
-#SBATCH --time=1-00:00:00
+#SBATCH --time=0-00:20:00
 #SBATCH --mem-per-gpu=120G
 #SBATCH --output=slurm/outputs/train_%A.out
 
@@ -18,7 +18,7 @@ module load CUDA/11.7.0
 
 source activate metaicla
 
-srun python -u train.py \
+srun python -u -m torch.distributed.launch --nproc_per_node=1 train.py \
     --task hr_to_lr \
     --k 16384 \
     --test_k 16 \
@@ -27,8 +27,8 @@ srun python -u train.py \
     --use_demonstrations \
     --method direct \
     --n_gpu 1 \
-    --batch_size 2 \
-    --accum_steps 4 \
+    --batch_size 1 \
+    --accum_steps 8 \
     --lr 1e-05 \
     --lr 1e-05 \
     --fp16 \
@@ -36,5 +36,6 @@ srun python -u train.py \
     --n_process 18 \
     --tensorize_dir /scratch-shared/gstarace/repos/metaICLA/tensorized \
     --data_dir /scratch-shared/gstarace/repos/metaICLA/data \
-    --out_dir /scratch-shared/gstarace/repos/metaICLA/checkpoints/direct-metaicl/hr_to_lr
+    --out_dir /scratch-shared/gstarace/repos/metaICLA/checkpoints/direct-metaicl/hr_to_lr \
+    --disable_wandb
 
