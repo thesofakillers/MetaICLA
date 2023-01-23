@@ -91,7 +91,7 @@ def main(logger, args):
         tensorize_dir=args.tensorize_dir,
         n_process=args.n_process,
         n_gpu=args.n_gpu,
-        local_rank=args.local_rank,
+        local_rank=-1
     )
     metaicl_data.tensorize_for_training(
         train_data,
@@ -130,7 +130,7 @@ def main(logger, args):
         logger,
         args.out_dir,
         args.fp16,
-        args.local_rank,
+        -1,
         enable_adapter=args.enable_adapter,
     )
     metaicl_model.load(args.init_checkpoint, args.gpt2)
@@ -142,7 +142,7 @@ def main(logger, args):
         args.weight_decay,
         args.warmup_steps,
     )
-    metaicl_model.parallel()
+    # metaicl_model.parallel()
     metaicl_model.train()
     metaicl_model.do_train(
         metaicl_data,
@@ -221,6 +221,8 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
+
+    args.local_rank = -1
 
     handlers = [logging.StreamHandler()]
     if args.log_file is not None:
