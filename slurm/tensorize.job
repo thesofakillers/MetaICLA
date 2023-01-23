@@ -4,7 +4,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --job-name=Tensorize
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=18
+#SBATCH --cpus-per-task=72
 #SBATCH --time=1-00:00:00
 #SBATCH --mem-per-gpu=120G
 #SBATCH --output=slurm/outputs/tensorize_%A.out
@@ -27,7 +27,7 @@ srun python -u train.py \
     --method direct \
     --do_tensorize \
     --n_gpu 1 \
-    --n_process 18 \
+    --n_process 72 \
     --tensorize_dir /scratch-shared/gstarace/repos/metaICLA/tensorized \
     --data_dir /scratch-shared/gstarace/repos/metaICLA/data
 
