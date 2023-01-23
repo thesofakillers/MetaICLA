@@ -149,7 +149,7 @@ class MetaICLModel(object):
             if self.enable_adapter:
                 self.logger.info("Saving adapter parameters and head at step=%d" % step)
                 self.model.save_adapter(
-                    os.path.join(self.out_dir, "adapter-{}.pt".format(step)),
+                    os.path.join(self.out_dir, "adapter-{}".format(step)),
                     self.adapter_name,
                     with_head=True,
                 )
