@@ -31,7 +31,7 @@ srun python -u train.py \
     --accum_steps 4 \
     --lr 1e-05 \
     --lr 1e-05 \
-    --fpt16 \
+    --fp16 \
     --optimization 8bit-adam \
     --n_process 18 \
     --tensorize_dir /scratch-shared/gstarace/repos/metaICLA/tensorized \
