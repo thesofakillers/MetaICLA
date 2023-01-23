@@ -36,6 +36,4 @@ srun python -u -m torch.distributed.launch --nproc_per_node=1 train.py \
     --n_process 18 \
     --tensorize_dir /scratch-shared/gstarace/repos/metaICLA/tensorized \
     --data_dir /scratch-shared/gstarace/repos/metaICLA/data \
-    --out_dir /scratch-shared/gstarace/repos/metaICLA/checkpoints/direct-metaicl/hr_to_lr \
-    --disable_wandb
-
+    --out_dir /scratch-shared/gstarace/repos/metaICLA/checkpoints/direct-metaicl/hr_to_lr
