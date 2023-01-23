@@ -118,7 +118,13 @@ def main(logger, args):
     if args.local_rank <= 0 and not os.path.exists(args.out_dir):
         os.makedirs(args.out_dir)
 
-    metaicl_model = MetaICLModel(logger, args.out_dir, args.fp16, args.local_rank)
+    metaicl_model = MetaICLModel(
+        logger,
+        args.out_dir,
+        args.fp16,
+        args.local_rank,
+        enable_adapter=args.enable_adapter,
+    )
     metaicl_model.load(args.init_checkpoint, args.gpt2)
     metaicl_model.to_device()
     metaicl_model.setup_optimizer(
@@ -195,6 +201,11 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--disable_wandb", action="store_true", help="whether to disable  wandb logging"
+    )
+    parser.add_argument(
+        "--enable_adapter",
+        action="store_true",
+        help="whether to enable adapter training",
     )
 
     args = parser.parse_args()

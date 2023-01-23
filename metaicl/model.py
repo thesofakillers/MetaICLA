@@ -18,7 +18,15 @@ import wandb
 
 
 class MetaICLModel(object):
-    def __init__(self, logger=None, out_dir=None, fp16=True, local_rank=-1):
+    def __init__(
+        self,
+        logger=None,
+        out_dir=None,
+        fp16=True,
+        local_rank=-1,
+        enable_adapter=False,
+        adapter_name="metaicl",
+    ):
         if logger is None:
 
             class Logger:
@@ -31,6 +39,8 @@ class MetaICLModel(object):
         self.out_dir = out_dir
         self.fp16 = fp16
         self.local_rank = local_rank
+        self.enable_adapter = enable_adapter
+        self.adapter_name = adapter_name
 
         if self.local_rank == -1:
             device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -75,6 +85,9 @@ class MetaICLModel(object):
 
     def train(self):
         self.model.train()
+        if self.enable_adapter:
+            self.model.train_adapter(self.adapter_name)
+            self.model.set_active_adapters(self.adapter_name)
         self.mode = "train"
 
     def eval(self):
@@ -126,18 +139,31 @@ class MetaICLModel(object):
                 self.logger.info("Loading the model from %s" % checkpoint)
             state_dict = torch.load(checkpoint)
             model = AutoModelForCausalLM.from_pretrained(gpt2, state_dict=state_dict)
+        if self.enable_adapter:
+            if self.adapter_name not in model.config.adapters:
+                print(f"Adding adapter {self.adapter_name}")
+                model.add_adapter(self.adapter_name, config="pfeiffer")
         self.model = model
 
     def save(self, step):
         if self.local_rank <= 0:
-            model_state_dict = {
-                key[7:] if key.startswith("module.") else key: value.cpu()
-                for key, value in self.model.state_dict().items()
-            }
-            torch.save(
-                model_state_dict, os.path.join(self.out_dir, "model-{}.pt".format(step))
-            )
-            self.logger.info("Saving model parameters at step=%d" % step)
+            if self.enable_adapter:
+                self.logger.info("Saving adapter parameters and head at step=%d" % step)
+                self.model.save_adapter(
+                    os.path.join(self.out_dir, "adapter-{}.pt".format(step)),
+                    self.adapter_name,
+                    with_head=True,
+                )
+            else:
+                model_state_dict = {
+                    key[7:] if key.startswith("module.") else key: value.cpu()
+                    for key, value in self.model.state_dict().items()
+                }
+                torch.save(
+                    model_state_dict,
+                    os.path.join(self.out_dir, "model-{}.pt".format(step)),
+                )
+                self.logger.info("Saving model parameters at step=%d" % step)
 
     def setup_optimizer(
         self, optimization, num_training_steps, lr, weight_decay, warmup_steps
@@ -288,11 +314,13 @@ class MetaICLModel(object):
                         "local rank %d\tglobal step %d\ttrain loss %.2f"
                         % (self.local_rank, global_step, np.mean(train_losses))
                     )
-                    wandb.log({
-                        "local_rank": self.local_rank,
-                        "global_step": global_step,
-                        "train_loss": np.mean(train_losses)
-                    })
+                    wandb.log(
+                        {
+                            "local_rank": self.local_rank,
+                            "global_step": global_step,
+                            "train_loss": np.mean(train_losses),
+                        }
+                    )
                     train_losses = []
 
                 if global_step % save_period == 0:
