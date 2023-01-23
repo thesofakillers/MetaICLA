@@ -91,7 +91,7 @@ def main(logger, args):
         tensorize_dir=args.tensorize_dir,
         n_process=args.n_process,
         n_gpu=args.n_gpu,
-        local_rank=-1
+        local_rank=-1,
     )
     metaicl_data.tensorize_for_training(
         train_data,
