@@ -1,3 +1,5 @@
+sandbox.ipynb
+/.ipynb_checkpoints/
 wandb
 /slurm/.secrets
 /slurm/outputs/
