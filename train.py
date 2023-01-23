@@ -34,6 +34,7 @@ def main(logger, args):
         config=vars(args),
         job_type="metaicla-tensorize" if args.do_tensorize else "metaicla-train",
         group=script_host,
+        mode="disabled" if args.disable_wandb else "online",
     )
 
     if args.gpt2.startswith("gpt2"):
@@ -191,6 +192,9 @@ if __name__ == "__main__":
         type=int,
         default=1,
         help="Number of steps to accumulate gradients for",
+    )
+    parser.add_argument(
+        "--disable_wandb", action="store_true", help="whether to disable  wandb logging"
     )
 
     args = parser.parse_args()
