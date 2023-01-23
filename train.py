@@ -28,11 +28,19 @@ import wandb
 
 def main(logger, args):
     script_host = "slurm" if "SLURM_JOB_ID" in os.environ else "local"
+    job_type: str
+    if args.do_tensorize:
+        job_type = "metaicla-tensorize"
+    else:
+        if args.enable_adapter:
+            job_type = "metaicla-adapter-train"
+        else:
+            job_type = "metaicla-train"
     wandb.init(
         entity="giulio-uva",
         project="claficle",
         config=vars(args),
-        job_type="metaicla-tensorize" if args.do_tensorize else "metaicla-train",
+        job_type=job_type,
         group=script_host,
         mode="disabled" if args.disable_wandb else "online",
     )
@@ -208,7 +216,9 @@ if __name__ == "__main__":
         help="whether to enable adapter training",
     )
     parser.add_argument("--log_period", default=5000, help="how often to log", type=int)
-    parser.add_argument("--save_period", default=5000, help="how often to save", type=int)
+    parser.add_argument(
+        "--save_period", default=5000, help="how often to save", type=int
+    )
 
     args = parser.parse_args()
 
