@@ -130,7 +130,12 @@ def main(logger, args):
     metaicl_model.parallel()
     metaicl_model.train()
     metaicl_model.do_train(
-        metaicl_data, args.batch_size, num_training_steps, save_period, log_period
+        metaicl_data,
+        args.batch_size,
+        num_training_steps,
+        save_period,
+        log_period,
+        gradient_accumulation_steps=args.accum_steps,
     )
 
 
@@ -180,6 +185,12 @@ if __name__ == "__main__":
         type=str,
         default="data",
         help="Path to folder where data files are held",
+    )
+    parser.add_argument(
+        "--accum_steps",
+        type=int,
+        default=1,
+        help="Number of steps to accumulate gradients for",
     )
 
     args = parser.parse_args()
