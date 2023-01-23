@@ -14,6 +14,7 @@ from transformers import Adafactor, AdamW, get_linear_schedule_with_warmup
 from transformers import AutoModelForCausalLM
 
 from utils.utils import get_checkpoint_id, download_file
+import wandb
 
 
 class MetaICLModel(object):
@@ -287,6 +288,11 @@ class MetaICLModel(object):
                         "local rank %d\tglobal step %d\ttrain loss %.2f"
                         % (self.local_rank, global_step, np.mean(train_losses))
                     )
+                    wandb.log({
+                        "local_rank": self.local_rank,
+                        "global_step": global_step,
+                        "train_loss": np.mean(train_losses)
+                    })
                     train_losses = []
 
                 if global_step % save_period == 0:
