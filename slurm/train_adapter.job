@@ -30,7 +30,7 @@ srun python -u -m torch.distributed.launch --nproc_per_node=1 train.py \
     --batch_size 1 \
     --accum_steps 8 \
     --lr 1e-05 \
-    --lr 1e-05 \
+    --num_training_steps 240000 \
     --fp16 \
     --optimization 8bit-adam \
     --n_process 18 \
